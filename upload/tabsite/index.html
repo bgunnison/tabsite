@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#101813">
+  <meta name="description" content="A personal guitar tab book with zoom and adjustable auto-scroll.">
+  <title>Tab book · virtualrobot</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23182b2a'/%3E%3Cpath d='M7 9h18M7 16h18M7 23h18' stroke='%23cbec9c' stroke-width='2'/%3E%3Ccircle cx='12' cy='9' r='3' fill='%23cbec9c'/%3E%3Ccircle cx='21' cy='23' r='3' fill='%23cbec9c'/%3E%3C/svg%3E">
+  <script>
+    try {
+      if (JSON.parse(localStorage.getItem('tabbook-preferences') || '{}').theme === 'light') document.documentElement.dataset.theme = 'light';
+    } catch { /* Dark is the default when preferences are unavailable. */ }
+  </script>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script defer src="library.js?v=5"></script>
+  <script defer src="app.js?v=5"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to tabs</a>
+  <section id="library-view">
+    <header class="masthead">
+      <a class="brand" href="#" aria-label="Tab book home"><span class="brand-mark" aria-hidden="true">≡</span> virtualrobot<span class="brand-path"> / tabsite</span></a>
+      <div class="masthead-actions"><span class="edition">PERSONAL COLLECTION</span><button class="icon-button" type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><span class="theme-icon" aria-hidden="true">☀</span></button></div>
+    </header>
+    <main id="main" class="library" tabindex="-1">
+      <div class="library-heading"><h1>Tab book<span class="title-dot">.</span></h1><span id="song-count" class="song-count"></span></div>
+      <div class="contents-heading"><h2>Contents</h2><span>Alphabetical by title</span></div>
+      <nav id="alphabet" class="alphabet" aria-label="Jump to a letter"></nav>
+      <div id="contents"></div>
+      <p id="library-error" class="error" hidden>The tab collection could not be loaded. Refresh the page, or check that library.js was uploaded alongside index.html.</p>
+      <footer class="library-footer">Pick a tab. Make some time to play.</footer>
+    </main>
+  </section>
+
+  <section id="reader-view" hidden aria-label="Tab reader">
+    <header id="reader-toolbar" class="reader-toolbar">
+      <div class="reader-nav"><a href="#" class="back-link"><span aria-hidden="true">←</span> All tabs</a></div>
+      <div id="reader-controls" class="reader-controls">
+        <div class="zoom-control" role="group" aria-label="Tab zoom">
+          <span class="control-label">Zoom</span>
+          <button id="zoom-out" class="square" type="button" aria-label="Zoom out" title="Zoom out (−)">−</button>
+          <output id="zoom-value" aria-label="Zoom level">100%</output>
+          <button id="zoom-in" class="square" type="button" aria-label="Zoom in" title="Zoom in (+)">+</button>
+          <button id="fit" class="quiet-button" type="button" title="Fit the widest line to the screen">Fit</button>
+        </div>
+        <div class="speed-control">
+          <label for="speed">Speed <output id="speed-value" for="speed">20</output></label>
+          <input id="speed" type="range" min="2" max="80" step="1" value="20" aria-describedby="speed-help">
+          <span id="speed-help" class="sr-only">Pixels per second. Lower is slower.</span>
+        </div>
+        <div class="transport">
+          <button id="restart" class="quiet-button restart" type="button" aria-label="Return to start" title="Pause and return to start" disabled>Start</button>
+          <button id="play" class="play-button" type="button" aria-pressed="false" aria-label="Play scroll" title="Play scroll (Space)"><span id="play-icon" aria-hidden="true">▶</span><span id="play-label">Play scroll</span></button>
+        </div>
+      </div>
+      <div class="reader-actions">
+        <button id="compact-play" class="icon-button compact-play" type="button" aria-pressed="false" aria-label="Play scroll" title="Play scroll (Space)" hidden><span id="compact-play-icon" aria-hidden="true">▶</span></button>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><span class="theme-icon" aria-hidden="true">☀</span></button>
+        <button id="fullscreen" class="icon-button fullscreen-button" type="button" aria-label="Enter full screen" aria-pressed="false" title="Enter full screen" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path id="fullscreen-icon" d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button>
+        <button id="toggle-controls" class="icon-button" type="button" aria-expanded="true" aria-controls="reader-controls" aria-label="Hide controls" title="Hide controls"><span id="controls-arrow" aria-hidden="true">↑</span></button>
+      </div>
+      <span id="scroll-status" class="sr-only" role="status">Ready</span>
+    </header>
+    <main id="tab-viewport" class="tab-viewport" tabindex="0" aria-label="Tab content">
+      <article class="song-page">
+        <div class="song-heading"><h1 id="song-title"></h1><p id="song-artist"></p><span id="song-note"></span></div>
+        <div id="tab-content" class="tab-content"></div>
+        <div class="song-end">End of tab</div>
+      </article>
+    </main>
+  </section>
+  <p id="fullscreen-notice" class="fullscreen-notice" role="status" hidden></p>
+  <noscript><p class="error">Turn on JavaScript to open your tab collection and use auto-scroll.</p></noscript>
+</body>
+</html>
