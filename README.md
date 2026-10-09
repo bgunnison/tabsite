@@ -9,7 +9,7 @@ A viewer for a personal collection of guitar tabs. Includes an alphabetical tabl
 - **Full screen (four corners):** click the button beside the theme control to fill the screen with the app. Click it again, or press Esc, to exit. It stays available when the controls are collapsed. Browsers require a user click, so full screen never starts automatically. The button appears only when the browser supports and permits the Fullscreen API; availability on phones depends on the browser. Entering or leaving full screen pauses auto-scroll.
 - **Zoom − / +:** resizes the music text and diagrams. **Fit** fits the widest line to the available width. Long lines never wrap, preserving chord positions and six-string tab alignment. At larger zoom levels, pan horizontally inside the music area. Fitting a wide tab onto a phone can make it small; landscape mode or a tablet is more comfortable.
 - **Play scroll / Pause:** moves down the tab at the selected speed. This is scrolling, not audio playback.
-- **Speed:** 2–80 pixels per second; the initial value is 20. Change it while scrolling. Zoom changes the amount of content on screen, so adjust the speed by feel. It is not synchronized to BPM.
+- **Speed:** 2–80 pixels per second, remembered separately for each tab on this browser, including after reloading. New tabs start at 20, or your previously saved shared speed. Change it while scrolling. Zoom changes the amount of content on screen, so adjust the speed by feel. It is not synchronized to BPM.
 - **Start:** pauses and returns to the top of the tab. It is disabled when you are already at the start and not scrolling. Scrolling stops at the end. The space below the final line lets it rise into the reading area.
 - **Keyboard:** Space toggles scrolling; + and − zoom when focus is in the tab. Enter/Space activate focused buttons normally, and arrow keys operate the speed slider.
 - Manual scrolling, zooming, resizing, or hiding the browser tab pauses auto-scroll. Press Play scroll to resume from your current position.
@@ -17,7 +17,7 @@ A viewer for a personal collection of guitar tabs. Includes an alphabetical tabl
 
 ## Update the collection
 
-Keep the originals in `tabs/`. Add or replace `.docx` and `.txt` files there. Edit `metadata.json` to set clean display titles and artists; each key is the exact source filename. New files without metadata use their filename as the title.
+Keep the originals in `tabs/`. Add or replace `.docx` and `.txt` files there. Subfolders, including `tabs/old/`, are included in the collection. Edit `metadata.json` to set clean display titles and artists; each key is the exact source filename, or a path relative to `tabs/` when needed to distinguish matching filenames. New files without metadata use their filename as the title.
 
 Run from this project directory with Python 3:
 

@@ -91,10 +91,11 @@ def build():
     metadata = json.loads((ROOT / 'metadata.json').read_text(encoding='utf-8'))
     songs = []
     ids = set()
-    for path in sorted((ROOT / 'tabs').iterdir()):
-        if path.suffix.lower() not in ('.docx', '.txt') or path.name.startswith('~$'):
+    for path in sorted((ROOT / 'tabs').rglob('*')):
+        if not path.is_file() or path.suffix.lower() not in ('.docx', '.txt') or path.name.startswith('~$'):
             continue
-        entry = metadata.get(path.name, [path.stem.replace('_', ' '), ''])
+        source = path.relative_to(ROOT / 'tabs').as_posix()
+        entry = metadata.get(source, metadata.get(path.name, [path.stem.replace('_', ' '), '']))
         title, artist = entry[:2]
         options = entry[2] if len(entry) > 2 else {}
         song_id = slug(title)
@@ -118,7 +119,7 @@ def build():
         if first_text is not None and blocks[first_text]['text'] == options.get('sourceHeading'):
             blocks.pop(first_text)
             blocks = normalize(blocks)
-        songs.append({'id': song_id, 'title': title, 'artist': artist, 'note': options.get('note', ''), 'source': path.name, 'blocks': blocks})
+        songs.append({'id': song_id, 'title': title, 'artist': artist, 'note': options.get('note', ''), 'source': source, 'blocks': blocks})
     songs.sort(key=lambda s: (s['title'].casefold(), s['artist'].casefold()))
     data = json.dumps(songs, ensure_ascii=False, separators=(',', ':'))
     (OUTPUT / 'library.js').write_text('window.TAB_LIBRARY = ' + data + ';\n', encoding='utf-8')

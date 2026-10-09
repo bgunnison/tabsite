@@ -5,7 +5,9 @@
   const viewport = $('tab-viewport');
   let current = null;
   let zoom = 100;
-  let speed = 20;
+  let defaultSpeed = 20;
+  let speed = defaultSpeed;
+  const tabSpeeds = Object.create(null);
   let theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   let controlsHidden = window.matchMedia('(max-width:700px)').matches;
   let playing = false;
@@ -29,19 +31,26 @@
   function loadPreferences() {
     try {
       const saved = JSON.parse(localStorage.getItem('tabbook-preferences') || '{}');
-      if (Number.isFinite(saved.speed)) speed = Math.max(2, Math.min(80, saved.speed));
+      // Keep the old shared speed as the starting speed for unconfigured songs.
+      const fallback = saved.defaultSpeed ?? saved.speed;
+      if (Number.isFinite(fallback)) defaultSpeed = Math.max(2, Math.min(80, fallback));
+      if (saved.tabSpeeds && typeof saved.tabSpeeds === 'object' && !Array.isArray(saved.tabSpeeds)) {
+        for (const [id, value] of Object.entries(saved.tabSpeeds)) {
+          if (Number.isFinite(value)) tabSpeeds[id] = Math.max(2, Math.min(80, value));
+        }
+      }
       if (Number.isFinite(saved.zoom)) zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, saved.zoom));
       if (saved.theme === 'light' || saved.theme === 'dark') theme = saved.theme;
       if (typeof saved.controlsHidden === 'boolean') controlsHidden = saved.controlsHidden;
     } catch { /* Storage may be unavailable; the reader still works. */ }
-    $('speed').value = speed;
+    speed = defaultSpeed;
     updateSpeed();
     applyTheme();
     applyControlsVisibility();
   }
 
   function savePreferences() {
-    try { localStorage.setItem('tabbook-preferences', JSON.stringify({zoom, speed, theme, controlsHidden})); } catch { /* Optional local preference. */ }
+    try { localStorage.setItem('tabbook-preferences', JSON.stringify({zoom, defaultSpeed, tabSpeeds, theme, controlsHidden})); } catch { /* Optional local preference. */ }
   }
 
   function applyTheme() {
@@ -171,6 +180,8 @@
     pause();
     if (!current) libraryPosition = window.scrollY;
     current = song;
+    speed = tabSpeeds[song.id] ?? defaultSpeed;
+    updateSpeed();
     lastOpened = song.id;
     document.body.classList.add('reading');
     $('library-view').hidden = true;
@@ -220,7 +231,7 @@
       window.scrollTo(0, libraryPosition);
       if (lastOpened) $(`link-${lastOpened}`)?.focus({preventScroll:true});
     }
-    if (/^#letter-[A-Z]$/.test(location.hash)) $(location.hash.slice(1))?.scrollIntoView();
+    if (/^#letter-[A-Z0-9]$/.test(location.hash)) $(location.hash.slice(1))?.scrollIntoView();
   }
 
   function route() {
@@ -315,6 +326,7 @@
   }
 
   function updateSpeed() {
+    $('speed').value = speed;
     $('speed-value').textContent = speed;
     $('speed').setAttribute('aria-valuetext', `${speed} pixels per second`);
     if (playing) setStatus(`Scrolling · ${speed} px/s`);
@@ -349,7 +361,12 @@
   $('zoom-in').addEventListener('click', () => applyZoom(zoom + 10));
   $('zoom-out').addEventListener('click', () => applyZoom(zoom - 10));
   $('fit').addEventListener('click', fitToWidth);
-  $('speed').addEventListener('input', event => { speed = Number(event.target.value); updateSpeed(); savePreferences(); });
+  $('speed').addEventListener('input', event => {
+    speed = Number(event.target.value);
+    if (current) tabSpeeds[current.id] = speed;
+    updateSpeed();
+    savePreferences();
+  });
   const manualScroll = () => { if (playing) pause('Paused · Press play to resume'); };
   viewport.addEventListener('wheel', manualScroll, {passive:true});
   viewport.addEventListener('touchstart', manualScroll, {passive:true});
